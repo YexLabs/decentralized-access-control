@@ -81,7 +81,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
     }
 
     modifier onlyRoleApprovePass(bytes32 role, address account) {
-        require((_roles[role][account]) > (_roles[role].roleCount / 2));
+        require((_roles[role][account]) >= (_roles[role].roleCount / 2));
         _;
     }
 
