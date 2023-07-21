@@ -165,12 +165,27 @@ abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
         }
     }
 
+    /**
+     * @dev approve the certain `account` to have the `role`.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role`` identity.
+     */
+
     function approveRole(bytes32 role, address account, bool support) public virtual override onlyRole(role) {
         if(support){
             _roles[role][account].roleAproveCount += 1;
         }
     }
 
+    /**
+     * @dev set the maximum capacity for the role.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role``'s admin role.
+     */
 
     function setRoleMaximum(bytes32 role, uint8 capacity) public virtual override onlyRole(getRoleAdmin(role)) {
         require(capacity >  _roles[role].roleCount,"the new capacity should be greater than role count");

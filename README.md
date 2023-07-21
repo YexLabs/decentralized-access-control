@@ -4,9 +4,9 @@
 
 ## Rationale
 
-The original OpenZeppelin access control demonstrates a good way to manage the user access based on role. but it leaves some loopholes. 
+The original OpenZeppelin access control demonstrates a good way to manage the user access based on role management. but it leaves some loopholes. 
 
-- The adding and removal of the role solely relies on the role admin, which is a centralized point. The other contracts that use the original OpenZeppelin access control contract would suffer bad consequences if the role admin adds or removes the role based on their own will and is detrimental to the platform.
+- The adding and removal of the role solely relies on the role admin, which is a centralized point. The other contracts that use the original OpenZeppelin access control contract would suffer bad consequences if the role admin adds or removes the role based on their own will and is detrimental to their platform.
 
 - The original OpenZeppelin access control would allow the role admin to add as many members as they want. This may not necessarily be a good thing. One of the bad consequences is having too many members which leads to an inefficient and unresponsive role-based decision
 
@@ -17,6 +17,10 @@ The original OpenZeppelin access control demonstrates a good way to manage the u
 
 - this repo would allow the role admin to set up the capacity to address the issue of inefficient and unresponsive role-based decision
 
+
+## How to check all members belong to the role?
+
+For gas optimization purposes, on-chain data only records whether the role exists or not (with mapping data structure). The users of the decentralized access control can use tools like the graph to listen to the on-chain event and save the role member data in their database.
 
 
 
