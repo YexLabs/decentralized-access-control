@@ -4,6 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "./IAccessControl.sol";
+import "./Ownable.sol";
 import "../utils/Context.sol";
 import "../utils/Strings.sol";
 import "../utils/introspection/ERC165.sol";
@@ -46,7 +47,7 @@ import "../utils/introspection/ERC165.sol";
  * grant and revoke this role. Extra precautions should be taken to secure
  * accounts that have been granted it.
  */
-abstract contract AccessControl is Context, IAccessControl, ERC165 {
+abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
 
     //we change this struct data structure is for iterate the allRoles array to see
     //if they made the approve or we can simply just have the count variable to record this
@@ -58,7 +59,6 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
         uint8 roleCapacity;
         uint8 roleCount;
         mapping(address => uint8) roleAproveCount;
-        address[] allRoles;
     }
 
     mapping(bytes32 => RoleData) private _roles;
@@ -161,7 +161,6 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
         uint8 count = roleData.roleCount + 1;
         require(count <= roleData.roleCapacity, "CAPACITY OVERFLOW");
         roleData.roleCount = count;
-        roleData.allRoles.push(account);
         _grantRole(role, account);
         }
     }
@@ -244,7 +243,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
      *
      * Emits a {RoleAdminChanged} event.
      */
-    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual {
+    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual onlyOwner(){
         bytes32 previousAdminRole = getRoleAdmin(role);
         _roles[role].adminRole = adminRole;
         emit RoleAdminChanged(role, previousAdminRole, adminRole);
@@ -273,18 +272,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
         if (hasRole(role, account)) {
             RoleData storage roleData = _roles[role];
             roleData.members[account] = false;
-            //remove the roles from the all role array and count - 1
-            for (uint i = 0; i < roleData.allRoles.length;){
-                if (account == roleData.allRoles[i]){
-                    roleData.allRoles[i] = roleData.allRoles[roleData.allRoles.length - 1];
-					roleData.allRoles.pop();
-					break;
-                }
-                //gas optimization
-                unchecked {
-                    i ++;
-                }
-            }
+            //roleCount - 1 when remove the role from the member
             roleData.roleCount -= 1;
             emit RoleRevoked(role, account, _msgSender());
         }

@@ -7,6 +7,8 @@ pragma solidity ^0.8.0;
  * @dev External interface of AccessControl declared to support ERC165 detection.
  */
 interface IAccessControl {
+    
+    
     /**
      * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`
      *
@@ -58,6 +60,24 @@ interface IAccessControl {
      * - the caller must have ``role``'s admin role.
      */
     function grantRole(bytes32 role, address account) external;
+
+    /**
+     * @dev approve the certain `account` to have the `role`.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role`` identity.
+     */
+     function approveRole(bytes32 role, address account, bool support) external;
+
+    /**
+     * @dev set the maximum capacity for the role.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role``'s admin role.
+     */
+    function setRoleMaximum(bytes32 role, uint8 capacity) external;
 
     /**
      * @dev Revokes `role` from `account`.
