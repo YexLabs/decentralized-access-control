@@ -70,6 +70,15 @@ interface IAccessControl {
      */
      function approveRole(bytes32 role, address account, bool support) external;
 
+     /**
+     * @dev role members support to revoke the account to be the role member`.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role`` identity.
+     */
+     function rejectRole(bytes32 role, address account, bool support) external;
+
     /**
      * @dev set the maximum capacity for the role.
      *

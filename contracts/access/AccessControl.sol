@@ -47,7 +47,7 @@ import "../utils/introspection/ERC165.sol";
  * grant and revoke this role. Extra precautions should be taken to secure
  * accounts that have been granted it.
  */
-abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
+abstract contract AccessControl is Context,Ownable, IAccessControl, ERC165 {
 
     //we change this struct data structure is for iterate the allRoles array to see
     //if they made the approve or we can simply just have the count variable to record this
@@ -59,6 +59,7 @@ abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
         uint8 roleCapacity;
         uint8 roleCount;
         mapping(address => uint8) roleAproveCount;
+        mapping(address => uint8) roleRejectCount;
     }
 
     mapping(bytes32 => RoleData) private _roles;
@@ -81,7 +82,12 @@ abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
     }
 
     modifier onlyRoleApprovePass(bytes32 role, address account) {
-        require((_roles[role][account]) >= (_roles[role].roleCount / 2));
+        require((_roles[role].roleAproveCount[account]) >= (_roles[role].roleCount / 2));
+        _;
+    }
+
+    modifier onlyRejectPass(bytes32 role, address account) {
+        require((_roles[role].roleRejectCount[account]) >= (_roles[role].roleCount / 2));
         _;
     }
 
@@ -166,7 +172,7 @@ abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
     }
 
     /**
-     * @dev approve the certain `account` to have the `role`.
+     * @dev role members approve the certain `account` to be the new `role` member.
      *
      * Requirements:
      *
@@ -174,8 +180,24 @@ abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
      */
 
     function approveRole(bytes32 role, address account, bool support) public virtual override onlyRole(role) {
+        require(!hasRole(role, account),"INVALID: EXITED ACCOUNT");
         if(support){
-            _roles[role][account].roleAproveCount += 1;
+            _roles[role].roleAproveCount[account] += 1;
+        }
+    }
+
+    /**
+     * @dev role members support to revoke the account to be the role member`.
+     *
+     * Requirements:
+     *
+     * - the caller must have ``role`` identity.
+     */
+    
+    function rejectRole(bytes32 role, address account, bool support) public virtual override onlyRole(role) {
+        require(hasRole(role, account), "INVALID: NON-EXISTENCE ACCOUNT");
+        if(support){
+            _roles[role].roleRejectCount[account] += 1;
         }
     }
 
@@ -203,7 +225,7 @@ abstract contract AccessControl is Ownable, Context, IAccessControl, ERC165 {
      *
      * May emit a {RoleRevoked} event.
      */
-    function revokeRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) {
+    function revokeRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) onlyRejectPass(role,account) {
         _revokeRole(role, account);
     }
 
