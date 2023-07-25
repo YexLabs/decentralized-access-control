@@ -10,12 +10,17 @@ The original OpenZeppelin access control demonstrates a good way to manage the u
 
 - The original OpenZeppelin access control would allow the role admin to add as many members as they want. This may not necessarily be a good thing. One of the bad consequences is having too many members which leads to an inefficient and unresponsive role-based decision
 
+- The original OpenZeppelin access control contract would allows the one user with the same address
+to create multiple roles which is contributed the centralization of managing the role
+
 
 ## How we address the problem?
 
 - The new mechanism in this repo would disallow the role of admin from being the centralized point to make decisions for adding or removing role members. Instead, this contract would promote the participation of other role members in the decision-making process of adding or removing role members.
 
-- this repo would allow the role admin to set up the capacity to address the issue of inefficient and unresponsive role-based decision
+- The new mechanism would allow the role admin to set up the capacity to address the issue of inefficient and unresponsive role-based decision
+
+- The new mechanism would disallow one user to create multiple roles.
 
 
 ## How to check all members belong to the role?
