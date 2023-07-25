@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.8.0) (access/AccessControl.sol)
+// Yex Lab Contract v1.0.0
 
 pragma solidity ^0.8.0;
 
-import "./IAccessControl.sol";
+import "./IDecentralizedAccessControl.sol";
 import "./Ownable.sol";
 import "../utils/Context.sol";
 import "../utils/Strings.sol";
@@ -47,8 +47,7 @@ import "../utils/introspection/ERC165.sol";
  * grant and revoke this role. Extra precautions should be taken to secure
  * accounts that have been granted it.
  */
-abstract contract AccessControl is Context,Ownable, IAccessControl, ERC165 {
-
+abstract contract DecentralizedAccessControl is Context,Ownable, IDecentralizedAccessControl, ERC165 {
     //we change this struct data structure is for iterate the allRoles array to see
     //if they made the approve or we can simply just have the count variable to record this
     //for the sake of the gas savings, we should use the approve count variable to keep track of
@@ -95,7 +94,7 @@ abstract contract AccessControl is Context,Ownable, IAccessControl, ERC165 {
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IAccessControl).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IDecentralizedAccessControl).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
@@ -162,6 +161,7 @@ abstract contract AccessControl is Context,Ownable, IAccessControl, ERC165 {
      * May emit a {RoleGranted} event.
      */
     function grantRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) onlyRoleApprovePass(role,account) {
+        
         if (!hasRole(role, account)) {
         RoleData storage roleData = _roles[role];
         uint8 count = roleData.roleCount + 1;

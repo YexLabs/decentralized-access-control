@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts v4.4.1 (access/IAccessControl.sol)
+// Yex Lab Contract v1.0.0
 
 pragma solidity ^0.8.0;
 
 /**
  * @dev External interface of AccessControl declared to support ERC165 detection.
  */
-interface IAccessControl {
+interface IDecentralizedAccessControl {
     
     
     /**
