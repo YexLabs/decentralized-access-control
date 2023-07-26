@@ -13,8 +13,8 @@ import "./IMasterAccess.sol";
  * ```
  */
 
-abstract contract MasterAccess is IMasterAccess {
-    mapping(address => bool) private _role_store;
+contract MasterAccess is IMasterAccess {
+    mapping(address => bool) public _role_store;
 
     /**
      * @dev when storing a certain address, set the role_store status to true.
