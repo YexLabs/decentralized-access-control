@@ -4,7 +4,6 @@
 pragma solidity ^0.8.0;
 
 import "./IDecentralizedAccessControl.sol";
-import "./Ownable.sol";
 import "../utils/Context.sol";
 import "../utils/Strings.sol";
 import "../utils/introspection/ERC165.sol";
@@ -47,7 +46,7 @@ import "../utils/introspection/ERC165.sol";
  * grant and revoke this role. Extra precautions should be taken to secure
  * accounts that have been granted it.
  */
-abstract contract DecentralizedAccessControl is Context,Ownable, IDecentralizedAccessControl, ERC165 {
+abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessControl, ERC165 {
     //we change this struct data structure is for iterate the allRoles array to see
     //if they made the approve or we can simply just have the count variable to record this
     //for the sake of the gas savings, we should use the approve count variable to keep track of
@@ -280,7 +279,7 @@ abstract contract DecentralizedAccessControl is Context,Ownable, IDecentralizedA
      *
      * Emits a {RoleAdminChanged} event.
      */
-    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual onlyOwner(){
+    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual {
         bytes32 previousAdminRole = getRoleAdmin(role);
         _roles[role].adminRole = adminRole;
         emit RoleAdminChanged(role, previousAdminRole, adminRole);
