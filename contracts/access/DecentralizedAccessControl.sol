@@ -210,7 +210,7 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      */
 
     function setRoleMaximum(bytes32 role, uint8 capacity) public virtual override onlyRole(getRoleAdmin(role)) {
-        require(capacity >  _roles[role].roleCount && capacity < MAXIMUM_LOAD,"capacity requirement not met");
+        require(capacity < MAXIMUM_LOAD && capacity > _roles[role].roleCount,"capacity requirement not met");
         _roles[role].roleCapacity = capacity;
     }
 
