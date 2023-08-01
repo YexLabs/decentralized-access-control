@@ -51,6 +51,7 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
     //if they made the approve or we can simply just have the count variable to record this
     //for the sake of the gas savings, we should use the approve count variable to keep track of
     //but that's the under the trade off of the gas saving and transparency for the user
+    uint MAXIMUM_LOAD = 35;
     struct RoleData {
         mapping(address => bool) members;
         bytes32 adminRole;
@@ -209,7 +210,7 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      */
 
     function setRoleMaximum(bytes32 role, uint8 capacity) public virtual override onlyRole(getRoleAdmin(role)) {
-        require(capacity >  _roles[role].roleCount,"the new capacity should be greater than role count");
+        require(capacity >  _roles[role].roleCount && capacity < MAXIMUM_LOAD,"capacity requirement not met");
         _roles[role].roleCapacity = capacity;
     }
 
