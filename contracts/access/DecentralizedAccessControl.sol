@@ -7,6 +7,7 @@ import "./IDecentralizedAccessControl.sol";
 import "../utils/Context.sol";
 import "../utils/Strings.sol";
 import "../utils/introspection/ERC165.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Contract module that allows children to implement role-based access
@@ -46,7 +47,11 @@ import "../utils/introspection/ERC165.sol";
  * grant and revoke this role. Extra precautions should be taken to secure
  * accounts that have been granted it.
  */
-abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessControl, ERC165 {
+abstract contract DecentralizedAccessControl is
+    Context,
+    IDecentralizedAccessControl,
+    ERC165
+{
     //we change this struct data structure is for iterate the allRoles array to see
     //if they made the approve or we can simply just have the count variable to record this
     //for the sake of the gas savings, we should use the approve count variable to keep track of
@@ -80,26 +85,39 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
     }
 
     modifier onlyRoleApprovePass(bytes32 role, address account) {
-        require((_roles[role].roleAproveCount[account]) >= (_roles[role].roleCount / 2));
+        require(
+            (_roles[role].roleAproveCount[account]) >=
+                (_roles[role].roleCount / 2)
+        );
         _;
     }
 
     modifier onlyRejectPass(bytes32 role, address account) {
-        require((_roles[role].roleRejectCount[account]) >= (_roles[role].roleCount / 2));
+        require(
+            (_roles[role].roleRejectCount[account]) >=
+                (_roles[role].roleCount / 2)
+        );
         _;
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IDecentralizedAccessControl).interfaceId || super.supportsInterface(interfaceId);
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override returns (bool) {
+        return
+            interfaceId == type(IDecentralizedAccessControl).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
     /**
      * @dev Returns `true` if `account` has been granted `role`.
      */
-    function hasRole(bytes32 role, address account) public view virtual override returns (bool) {
+    function hasRole(
+        bytes32 role,
+        address account
+    ) public view virtual override returns (bool) {
         return _roles[role].members[account];
     }
 
@@ -143,7 +161,9 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      *
      * To change a role's admin, use {_setRoleAdmin}.
      */
-    function getRoleAdmin(bytes32 role) public view virtual override returns (bytes32) {
+    function getRoleAdmin(
+        bytes32 role
+    ) public view virtual override returns (bytes32) {
         return _roles[role].adminRole;
     }
 
@@ -159,14 +179,22 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      *
      * May emit a {RoleGranted} event.
      */
-    function grantRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) onlyRoleApprovePass(role,account) {
-        
+    function grantRole(
+        bytes32 role,
+        address account
+    )
+        public
+        virtual
+        override
+        onlyRole(getRoleAdmin(role))
+        onlyRoleApprovePass(role, account)
+    {
         if (!hasRole(role, account)) {
-        RoleData storage roleData = _roles[role];
-        uint8 count = roleData.roleCount + 1;
-        require(count <= roleData.roleCapacity, "CAPACITY OVERFLOW");
-        roleData.roleCount = count;
-        _grantRole(role, account);
+            RoleData storage roleData = _roles[role];
+            uint8 count = roleData.roleCount + 1;
+            require(count <= roleData.roleCapacity, "CAPACITY OVERFLOW");
+            roleData.roleCount = count;
+            _grantRole(role, account);
         }
     }
 
@@ -178,9 +206,13 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      * - the caller must have ``role`` identity.
      */
 
-    function approveRole(bytes32 role, address account, bool support) public virtual override onlyRole(role) {
-        require(!hasRole(role, account),"INVALID: EXITED ACCOUNT");
-        if(support){
+    function approveRole(
+        bytes32 role,
+        address account,
+        bool support
+    ) public virtual override onlyRole(role) {
+        require(!hasRole(role, account), "INVALID: EXITED ACCOUNT");
+        if (support) {
             _roles[role].roleAproveCount[account] += 1;
         }
     }
@@ -192,10 +224,14 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      *
      * - the caller must have ``role`` identity.
      */
-    
-    function rejectRole(bytes32 role, address account, bool support) public virtual override onlyRole(role) {
+
+    function rejectRole(
+        bytes32 role,
+        address account,
+        bool support
+    ) public virtual override onlyRole(role) {
         require(hasRole(role, account), "INVALID: NON-EXISTENCE ACCOUNT");
-        if(support){
+        if (support) {
             _roles[role].roleRejectCount[account] += 1;
         }
     }
@@ -208,8 +244,14 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      * - the caller must have ``role``'s admin role.
      */
 
-    function setRoleMaximum(bytes32 role, uint8 capacity) public virtual override onlyRole(getRoleAdmin(role)) {
-        require(capacity >  _roles[role].roleCount,"the new capacity should be greater than role count");
+    function setRoleMaximum(
+        bytes32 role,
+        uint8 capacity
+    ) public virtual override onlyRole(getRoleAdmin(role)) {
+        require(
+            capacity > _roles[role].roleCount,
+            "the new capacity should be greater than role count"
+        );
         _roles[role].roleCapacity = capacity;
     }
 
@@ -224,7 +266,16 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      *
      * May emit a {RoleRevoked} event.
      */
-    function revokeRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) onlyRejectPass(role,account) {
+    function revokeRole(
+        bytes32 role,
+        address account
+    )
+        public
+        virtual
+        override
+        onlyRole(getRoleAdmin(role))
+        onlyRejectPass(role, account)
+    {
         _revokeRole(role, account);
     }
 
@@ -244,8 +295,14 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      *
      * May emit a {RoleRevoked} event.
      */
-    function renounceRole(bytes32 role, address account) public virtual override {
-        require(account == _msgSender(), "AccessControl: can only renounce roles for self");
+    function renounceRole(
+        bytes32 role,
+        address account
+    ) public virtual override {
+        require(
+            account == _msgSender(),
+            "AccessControl: can only renounce roles for self"
+        );
 
         _revokeRole(role, account);
     }
@@ -293,8 +350,8 @@ abstract contract DecentralizedAccessControl is Context, IDecentralizedAccessCon
      * May emit a {RoleGranted} event.
      */
     function _grantRole(bytes32 role, address account) internal virtual {
-            _roles[role].members[account] = true;
-            emit RoleGranted(role, account, _msgSender());
+        _roles[role].members[account] = true;
+        emit RoleGranted(role, account, _msgSender());
     }
 
     /**
