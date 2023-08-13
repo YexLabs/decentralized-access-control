@@ -351,6 +351,11 @@ abstract contract DecentralizedAccessControl is
      */
     function _grantRole(bytes32 role, address account) internal virtual {
         _roles[role].members[account] = true;
+
+        // clean
+        delete _roles[role].roleAproveCount[account];
+        delete _roles[role].roleRejectCount[account];
+
         emit RoleGranted(role, account, _msgSender());
     }
 
@@ -367,6 +372,11 @@ abstract contract DecentralizedAccessControl is
             roleData.members[account] = false;
             //roleCount - 1 when remove the role from the member
             roleData.roleCount -= 1;
+
+            // clean
+            delete roleData.roleAproveCount[account];
+            delete roleData.roleRejectCount[account];
+
             emit RoleRevoked(role, account, _msgSender());
         }
     }
