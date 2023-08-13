@@ -187,4 +187,40 @@ describe("GeneralAccessControl", function () {
 
         });
     });
+
+    describe("RenounceRole", function () {
+        it("Should fail if renounce not by self", async function () {
+            const { generalAccessControl, masterAccessAddr, accounts } = await loadFixture(deployAccessControlFixture);
+
+            const role1 = ethers.keccak256(ethers.encodeBytes32String('ROLE1'));
+            // init role capacity
+            await generalAccessControl.setRoleMaximum(role1, 4);
+
+            // grant role1 for account1
+            const account1 = accounts[1];
+            await generalAccessControl.grantRole(role1, account1.address);
+            expect(await generalAccessControl.hasRole(role1, account1.address)).to.equal(true);
+
+            // renounce role
+            await expect(generalAccessControl.renounceRole(role1, account1.address)).to.be.reverted;
+
+        });
+        it("Should success if renounce by self", async function () {
+            const { generalAccessControl, masterAccessAddr, accounts } = await loadFixture(deployAccessControlFixture);
+
+            const role1 = ethers.keccak256(ethers.encodeBytes32String('ROLE1'));
+            // init role capacity
+            await generalAccessControl.setRoleMaximum(role1, 4);
+
+            // grant role1 for account1
+            const account1 = accounts[1];
+            await generalAccessControl.grantRole(role1, account1.address);
+            expect(await generalAccessControl.hasRole(role1, account1.address)).to.equal(true);
+
+            // renounce role
+            await generalAccessControl.connect(account1).renounceRole(role1, account1.address);
+            expect(await generalAccessControl.hasRole(role1, account1.address)).to.equal(false);
+
+        });
+    });
 });
