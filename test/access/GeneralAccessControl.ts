@@ -120,6 +120,47 @@ describe("GeneralAccessControl", function () {
             await generalAccessControl.grantRole(role1, account3.address);
             expect(await generalAccessControl.hasRole(role1, account3.address)).to.equal(true);
         });
+
+        it("GrantRole ==> RevokeRole ==> GrantRole", async function () {
+            const { generalAccessControl, masterAccessAddr, accounts } = await loadFixture(deployAccessControlFixture);
+
+            const role1 = ethers.keccak256(ethers.encodeBytes32String('ROLE1'));
+            // init role capacity
+            await generalAccessControl.setRoleMaximum(role1, 4);
+
+
+            // grant role1 for account1
+            const account1 = accounts[1];
+            await generalAccessControl.grantRole(role1, account1.address);
+            expect(await generalAccessControl.hasRole(role1, account1.address)).to.equal(true);
+
+            // grant role1 for account2
+            const account2 = accounts[2];
+            await generalAccessControl.grantRole(role1, account2.address);
+            expect(await generalAccessControl.hasRole(role1, account2.address)).to.equal(true);
+
+            // grant role1 for account3 will fail since no one approve
+            const account3 = accounts[3];
+            await expect(generalAccessControl.grantRole(role1, account3.address)).to.be.reverted;
+
+            // account2 approve grant role for account3
+            await generalAccessControl.connect(account2).approveRole(role1, account3.address, true);
+
+            await generalAccessControl.grantRole(role1, account3.address);
+            expect(await generalAccessControl.hasRole(role1, account3.address)).to.equal(true);
+
+
+            // renounce role
+            await generalAccessControl.connect(account3).renounceRole(role1, account3.address);
+            expect(await generalAccessControl.hasRole(role1, account3.address)).to.equal(false);
+
+            // reGrant role
+            await generalAccessControl.connect(account2).approveRole(role1, account3.address, true);
+
+            await generalAccessControl.grantRole(role1, account3.address);
+            expect(await generalAccessControl.hasRole(role1, account3.address)).to.equal(true);
+
+        });
     });
 
     describe("RevokeRole", function () {
